@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ahorcado!</title>
+
+        <style>
+
+            #vidas, #vidas2{
+                text-align: center;
+                border: 1px solid black;
+                border-radius: 20px;
+                padding: 10px;
+                margin: 10px;
+            }
+
+            #pintar1, #pintar2 {
+                display: flex; 
+                border: 1px solid black; 
+                padding: 10px; 
+                margin: 10px;
+            }
+
+            #boton, #boton2, #boton3{
+                padding: 10px;
+                margin: 10px;
+            }
+
+            #boton2{
+                display: none;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <section style = "display: none;">
+            <div id = "clonar">&nbsp;_</div>
+        </section>
+
+        Palabra a adivinar:
+        <section id = "pintar1">
+
+        </section><br>
+
+        Letras introducidas:
+        <div id = "pintar2">
+
+        </div><br>
+
+        Avisos:
+        <div id = "vidas">Numero de vidas: 5 ♡</div><br>
+
+        Botones:<br>
+        <button id = "boton" value="boton" onclick="location.reload();">Reiniciar</button>
+        <button id = "boton2" value="boton" onclick="buscarLetra();">Continuar</button>
+        <button id = "boton3" value="boton" onclick="buscarLetra();">Comenzar</button>
+
+        <script>
+
+            // Variables
+            var palabra;
+            var numLetras;
+            var vectorLetras = [];
+            var contadorVidas = 5;
+
+            // Elegir palabra y contar letras
+            function seleccionarPalabra() {
+                var eleccion = Math.floor((Math.random() * 20) + 1);
+
+                switch (eleccion) {
+                    case 1:
+                        palabra = "saltamontes";
+                        break;
+                    case 2:
+                        palabra = "pañuelo";
+                        break;
+                    case 3:
+                        palabra = "macarrones";
+                        break;
+                    case 4:
+                        palabra = "cuaderno";
+                        break;
+                    case 5:
+                        palabra = "botella";
+                        break;
+                    case 6:
+                        palabra = "llavero";
+                        break;
+                    case 7:
+                        palabra = "lampara";
+                        break;
+                    case 8:
+                        palabra = "agenda";
+                        break;
+                    case 9:
+                        palabra = "ventana";
+                        break;
+                    case 10:
+                        palabra = "ordenador";
+                        break;
+                    case 11:
+                        palabra = "servidor";
+                        break;
+                    case 12:
+                        palabra = "cliente";
+                        break;
+                    case 13:
+                        palabra = "galleta";
+                        break;
+                    case 14:
+                        palabra = "persiana";
+                        break;
+                    case 15:
+                        palabra = "yunque";
+                        break;
+                    case 16:
+                        palabra = "yacimiento";
+                        break;
+                    case 17:
+                        palabra = "cartera";
+                        break;
+                    case 18:
+                        palabra = "chaqueta";
+                        break;
+                    case 19:
+                        palabra = "jersey";
+                        break;
+                    case 20:
+                        palabra = "caracola";
+                        break;
+                }
+
+                numLetras = palabra.length;
+            }
+
+            // Clona la barra "_" tantas veces como letras haya
+            var contadorBarras;
+            function clonarBarras() {
+                var elmnt = document.getElementById("clonar");
+                var cln = elmnt.cloneNode(true);
+                cln.id = contadorBarras;
+                document.getElementById("pintar1").appendChild(cln);
+                contadorBarras++;
+            }
+
+            // Pinta todas las barras
+            function pintarBarras() {
+                for (var i = 0; i < numLetras; i++) {
+                    clonarBarras();
+                }
+            }
+
+            // Introducir letra
+            function introducirLetra() {
+                var miLetraOriginal = prompt("Introduzca una letra");
+                var miLetra = miLetraOriginal.toLowerCase();
+                var repetirLetra = "no";
+
+                // Comprobamos si el usuario introduce letras repetidas
+                for (var i = 0; i < vectorLetras.length; i++) {
+                    if (miLetra == vectorLetras[i]) {
+                        repetirLetra = "si";
+                    }
+                }
+
+                if (repetirLetra == "si") {
+                    letraRepetida();
+                    return("0");
+                } else {
+                    vectorLetras.push(miLetra);
+                    document.getElementById("pintar2").innerHTML = vectorLetras;
+                    return (miLetra);
+                }
+            }
+
+            // Si la letra esta repetida, avisamos al usuario
+            function letraRepetida() {
+                document.getElementById("vidas").innerHTML = "Letra repetida!";
+            }
+
+            // Buscamos la letra
+            function buscarLetra() {
+                document.getElementById("boton3").style.cssText = "display: none";
+                document.getElementById("boton2").style.cssText = "display: table-cell";
+
+                if (comprobarFinPartida() == "no") {
+
+                    var miLetra = introducirLetra();
+                    if (miLetra != "0") {
+
+                        // Por defecto se perderia una vida
+                        var perderVida = 1;
+
+                        for (var j = 0; j < 20; j++) {
+
+                            // Si la letra se encuentra en nuestra palabra ...
+                            if (miLetra == palabra.charAt(j)) {
+                                // ... la colocamos en su sitio
+                                document.getElementById(j).innerHTML = ("&nbsp;" + miLetra + "&nbsp;");
+                                // ... y ya no pierde vidas el usuario
+                                perderVida = 0;
+                                numLetras--;
+                            }
+                        }
+
+                        if (perderVida == 1) {
+                            restarVidas();
+                        }
+
+                        mostrarVidas();
+                    }
+                }
+            }
+
+            // Funcion para restar una vida
+            function restarVidas() {
+                return (contadorVidas--);
+            }
+
+            // Funcion para mostrar el numero de vidas
+            function mostrarVidas() {
+                document.getElementById("vidas").innerHTML = "Numero de vidas: "
+                        + contadorVidas + " ♡";
+            }
+
+            // Comprueba si la partida ha acabado
+            function comprobarFinPartida() {
+                var finalPartida = "no";
+
+                if (contadorVidas == 0) {
+                    perderPartida();
+                    finalPartida = 'si';
+                } else if (numLetras == 0) {
+                    ganarPartida();
+                    finalPartida = "si";
+                }
+
+                if (finalPartida == "si") {
+                    return ("si");
+                } else {
+                    return ("no");
+                }
+            }
+
+            // Gana la partida
+            function ganarPartida() {
+                document.getElementById("vidas").innerHTML = "Ha ganado la partida!";
+            }
+
+            // Pierde la partida
+            function perderPartida() {
+                document.getElementById("vidas").innerHTML = "GAME OVER, la palabra era: " + palabra;
+            }
+
+            // Reiniciar
+            function empezarPartida() {
+                seleccionarPalabra();
+                contadorBarras = 0;
+                pintarBarras();
+            }
+
+            // Comienzo
+            window.onload = empezarPartida();
+
+        </script>
+
+    </body>
+</html>
